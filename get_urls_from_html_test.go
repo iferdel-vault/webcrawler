@@ -45,6 +45,72 @@ func TestGetURLsFromHTML(t *testing.T) {
 				"https://blog.boot.dev/path/one",
 			},
 		},
+		"urls nested into list and other tags": {
+			html: `
+			<html>
+				<body>
+					<div>
+						<ul>
+							<li>
+								<article>
+									<header>
+										<h2>
+											<a href="/post/1">
+												<span><strong>Read</strong> this post</span>
+											</a>
+										</h2>
+									</header>
+								</article>
+							</li>
+							<li>
+								<section>
+									<aside>
+										<p>
+											Check this: 
+											<a href="https://external.dev/page">
+												<em><span>External Page</span></em>
+											</a>
+										</p>
+									</aside>
+								</section>
+							</li>
+							<li>
+								<footer>
+									<small>
+										<a href="/contact">
+											<span><i>Contact us</i></span>
+										</a>
+									</small>
+								</footer>
+							</li>
+							<li>
+								<nav>
+									<ol>
+										<li>
+											<a href="/help/docs/start">
+												<span>
+													<i>
+														<code>Start Here</code>
+													</i>
+												</span>
+											</a>
+										</li>
+									</ol>
+								</nav>
+							</li>
+						</ul>
+					</div>
+				</body>
+			</html>
+			`,
+			inputURL: "https://blog.boot.dev",
+			expected: []string{
+				"https://blog.boot.dev/post/1",
+				"https://external.dev/page",
+				"https://blog.boot.dev/contact",
+				"https://blog.boot.dev/help/docs/start",
+			},
+		},
 	}
 
 	for name, tc := range tests {
