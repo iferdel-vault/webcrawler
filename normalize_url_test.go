@@ -19,6 +19,14 @@ func TestNormalizeURL(t *testing.T) {
 			inputURL: "http://test.dev.com/path/",
 			expected: "test.dev.com/path",
 		},
+		"remove query parameters": {
+			inputURL: "http://test.dev.com/path?test=1245&new=true",
+			expected: "test.dev.com/path",
+		},
+		"remove query parameters again": {
+			inputURL: "http://test.dev.com/path?sort=desc",
+			expected: "test.dev.com/path",
+		},
 	}
 
 	for name, tc := range tests {
