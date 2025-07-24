@@ -11,7 +11,7 @@ func TestGetURLsFromHTML(t *testing.T) {
 		inputURL string
 		expected []string
 	}{
-		"single url": {
+		"absolute and relative urls": {
 			html: `
 			<html>
 				<body>
@@ -28,6 +28,21 @@ func TestGetURLsFromHTML(t *testing.T) {
 			expected: []string{
 				"https://blog.boot.dev/path/one",
 				"https://other.com/path/one",
+			},
+		},
+		"self contained url": {
+			html: `
+			<html>
+				<body>
+					<a href="https://blog.boot.dev/path/one">
+						<span>Boot.dev</span>
+					</a>
+				</body>
+			</html>
+			`,
+			inputURL: "https://blog.boot.dev",
+			expected: []string{
+				"https://blog.boot.dev/path/one",
 			},
 		},
 	}
