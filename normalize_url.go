@@ -1,3 +1,5 @@
 package main
 
-func normalizeURL() {}
+func normalizeURL(inputURL string) (string, error) {
+	return "", nil
+}

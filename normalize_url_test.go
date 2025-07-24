@@ -25,7 +25,7 @@ func TestNormalizeURL(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			got, err := normalizeURL(tc.inputURL)
 			if err != nil {
-				t.Errorf("Test %v - '%s' FAIL: unexpected error: %v", name, err)
+				t.Errorf("Test '%s' FAIL: unexpected error: %v", name, err)
 				return
 			}
 			if tc.expected != got {
