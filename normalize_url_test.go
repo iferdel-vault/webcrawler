@@ -29,7 +29,7 @@ func TestNormalizeURL(t *testing.T) {
 				return
 			}
 			if tc.expected != got {
-				t.Errorf("expected %v, got %v", tc.expected, got)
+				t.Errorf("expected %q, got %q", tc.expected, got)
 			}
 		})
 	}
