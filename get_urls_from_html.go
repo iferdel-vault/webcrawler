@@ -7,14 +7,14 @@ import (
 )
 
 func getURLsFromHTML(htmlBody, rawBaseURL string) ([]string, error) {
-	// var urls []string
+	var urls []string
 
 	doc, err := html.Parse(strings.NewReader(htmlBody))
 	if err != nil {
 		return []string{}, err
 	}
 
-	urls, err := traverseNodesForURLS(doc)
+	urls, err = traverseNodesForURLS(doc)
 
 	for i, url := range urls {
 		if !strings.Contains(url, "http") {
