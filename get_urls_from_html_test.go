@@ -66,7 +66,7 @@ func TestGetURLsFromHTML(t *testing.T) {
 								<section>
 									<aside>
 										<p>
-											Check this: 
+											Check this:
 											<a href="https://external.dev/page">
 												<em><span>External Page</span></em>
 											</a>
