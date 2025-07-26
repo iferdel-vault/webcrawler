@@ -7,9 +7,10 @@ import (
 
 func TestGetURLsFromHTML(t *testing.T) {
 	tests := map[string]struct {
-		html     string
-		inputURL string
-		expected []string
+		html          string
+		inputURL      string
+		expected      []string
+		errorContains string
 	}{
 		"absolute and relative urls": {
 			html: `
@@ -110,6 +111,44 @@ func TestGetURLsFromHTML(t *testing.T) {
 				"https://blog.boot.dev/contact",
 				"https://blog.boot.dev/help/docs/start",
 			},
+		},
+		"no href": {
+			html: `
+				<html>
+					<body>
+						<a>
+							<span>ñeee</span>
+						</a>
+					</body>
+				</html>
+			`,
+			inputURL: "https://blog.dev",
+			expected: nil,
+		},
+		"invalid href URL": {
+			html: `
+				<html body>
+					<a href=":\\path/invalid">
+						<span>dev.dev</span>
+					</a>
+				</html body>
+				`,
+			inputURL: "https://blog.boot.dev",
+			expected: nil,
+		},
+		"handle invalid base URL": {
+			html: `
+				<html>
+					<body>
+						<a href="/path">
+							<span>Boot.dev</span>
+						</a>
+					</body>
+				</html>
+				`,
+			inputURL:      `:\\invalidBaseURL`,
+			expected:      nil,
+			errorContains: "couldn't parse base URL",
 		},
 	}
 
