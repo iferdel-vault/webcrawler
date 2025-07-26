@@ -2,6 +2,7 @@ package main
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -155,13 +156,21 @@ func TestGetURLsFromHTML(t *testing.T) {
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			got, err := getURLsFromHTML(tc.html, tc.inputURL)
-			if err != nil {
+			if err != nil && !strings.Contains(err.Error(), tc.errorContains) {
 				t.Errorf("Test '%s' FAIL: unexpected error: %v", name, err)
 				return
+			} else if err != nil && tc.errorContains == "" {
+				t.Errorf("Test '%s' FAIL: unexpected error: %v", name, err)
+				return
+			} else if err == nil && tc.errorContains != "" {
+				t.Errorf("Test '%s' FAIL: expected error containing '%v', got none.", name, tc.errorContains)
+				return
 			}
+
 			if !reflect.DeepEqual(tc.expected, got) {
 				t.Errorf("expected %q, got %q", tc.expected, got)
 			}
+
 		})
 	}
 }
