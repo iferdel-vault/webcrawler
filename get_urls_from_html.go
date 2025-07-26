@@ -1,33 +1,31 @@
 package main
 
 import (
+	"fmt"
+	"net/url"
 	"strings"
 
 	"golang.org/x/net/html"
 )
 
 func getURLsFromHTML(htmlBody, rawBaseURL string) ([]string, error) {
-	var urls []string
+
+	baseURL, err := url.Parse(rawBaseURL)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't parse base URL: %v", err)
+	}
 
 	doc, err := html.Parse(strings.NewReader(htmlBody))
 	if err != nil {
-		return []string{}, err
+		return nil, fmt.Errorf("couln't parse html: %v", err)
 	}
 
-	urls, err = traverseNodesForURLS(doc)
-
-	for i, url := range urls {
-		if !strings.Contains(url, "http") {
-			urls[i] = rawBaseURL + url
-		} else {
-			urls[i] = url
-		}
-	}
-
+	var urls []string
+	urls, err = traverseNodesForURLS(doc, *baseURL)
 	return urls, nil
 }
 
-func traverseNodesForURLS(node *html.Node) ([]string, error) {
+func traverseNodesForURLS(node *html.Node, baseURL url.URL) ([]string, error) {
 
 	var urls []string
 
@@ -37,7 +35,14 @@ func traverseNodesForURLS(node *html.Node) ([]string, error) {
 			case "a":
 				for _, a := range n.Attr {
 					if a.Key == "href" {
-						urls = append(urls, a.Val)
+						href, err := url.Parse(a.Val)
+						if err != nil {
+							fmt.Printf("couldn't parse href '%v': %v\n", a.Val, err)
+							continue
+						}
+
+						resolvedURL := baseURL.ResolveReference(href)
+						urls = append(urls, resolvedURL.String())
 					}
 				}
 			}
@@ -46,19 +51,3 @@ func traverseNodesForURLS(node *html.Node) ([]string, error) {
 
 	return urls, nil
 }
-
-// func traverseNodesForAnchorsRecursive(node *html.Node, urls *[]string) ([]string, error) {
-//
-// 	for n := range node.Descendants() {
-// 		if n.Type == html.ElementNode && n.Data == "a" {
-// 			for _, a := range n.Attr {
-// 				if a.Key == "href" {
-// 					fmt.Printf("found following url in href: %s\n", a.Val)
-// 					*urls = append(*urls, a.Val)
-// 				}
-// 			}
-// 		}
-// 	}
-//
-// 	return []string{}, nil
-// }
