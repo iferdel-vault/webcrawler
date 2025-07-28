@@ -11,6 +11,21 @@ func (cfg *config) pagesLen() int {
 	return len(cfg.pages)
 }
 
+func (cfg *config) addPageVisit(normalizedURL string) (isFirst bool) {
+
+	cfg.mu.Lock()
+	defer cfg.mu.Unlock()
+
+	if _, visited := cfg.pages[normalizedURL]; visited {
+		cfg.pages[normalizedURL] += 1
+		return false
+	}
+
+	// mark as 'first visited'
+	cfg.pages[normalizedURL] = 1
+	return true
+}
+
 func (cfg *config) crawlPage(rawCurrentURL string) {
 
 	// Blocks if the channel is full, limiting concurrent goroutines.
@@ -67,19 +82,4 @@ func (cfg *config) crawlPage(rawCurrentURL string) {
 			cfg.crawlPage(url)
 		}(url)
 	}
-}
-
-func (cfg *config) addPageVisit(normalizedURL string) (isFirst bool) {
-
-	cfg.mu.Lock()
-	defer cfg.mu.Unlock()
-
-	if _, visited := cfg.pages[normalizedURL]; visited {
-		cfg.pages[normalizedURL] += 1
-		return false
-	}
-
-	// mark as 'first visited'
-	cfg.pages[normalizedURL] = 1
-	return true
 }
