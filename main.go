@@ -15,15 +15,23 @@ func main() {
 		fmt.Println("too many arguments provided")
 		return
 	}
-
 	rawBaseURL := os.Args[1]
+
+	const maxConcurrency = 10
+	cfg, err := configure(rawBaseURL, maxConcurrency)
+	if err != nil {
+		fmt.Printf("Error - configure: %v", err)
+		return
+	}
+
 	fmt.Println("starting crawl of:", rawBaseURL)
 	fmt.Println("===============================")
 
-	pages := make(map[string]int)
-	crawlPage(rawBaseURL, rawBaseURL, pages)
+	cfg.wg.Add(1)
+	cfg.crawlPage(rawBaseURL)
+	cfg.wg.Wait()
 
-	for key, value := range pages {
+	for key, value := range cfg.pages {
 		fmt.Printf("%q: %d\n", key, value)
 	}
 }
