@@ -9,8 +9,12 @@ func TestSortPages(t *testing.T) {
 	tests := map[string]struct {
 		pages    map[string]int
 		baseURL  string
-		expected []reportStruct
+		expected []ReportStruct
 	}{
+		"nil map": {
+			pages:    nil,
+			expected: []ReportStruct{},
+		},
 		"no duplicates per count (number ordering)": {
 			pages: map[string]int{
 				"https://example.com/page3": 5,
@@ -18,10 +22,10 @@ func TestSortPages(t *testing.T) {
 				"https://example.com/page2": 2,
 			},
 			baseURL: "test.dev.com/path/",
-			expected: []reportStruct{
-				{Value: 10, Key: "https://example.com/page1"},
-				{Value: 5, Key: "https://example.com/page3"},
-				{Value: 2, Key: "https://example.com/page2"},
+			expected: []ReportStruct{
+				{Count: 10, URL: "https://example.com/page1"},
+				{Count: 5, URL: "https://example.com/page3"},
+				{Count: 2, URL: "https://example.com/page2"},
 			},
 		},
 		"one duplicate (alphabetically ordered)": {
@@ -31,10 +35,10 @@ func TestSortPages(t *testing.T) {
 				"https://example.com/c_key": 10,
 			},
 			baseURL: "test.dev.com/path/",
-			expected: []reportStruct{
-				{Value: 10, Key: "https://example.com/c_key"},
-				{Value: 5, Key: "https://example.com/a_key"}, // 'a_key' comes before 'b_key' alphabetically
-				{Value: 5, Key: "https://example.com/b_key"},
+			expected: []ReportStruct{
+				{Count: 10, URL: "https://example.com/c_key"},
+				{Count: 5, URL: "https://example.com/a_key"}, // 'a_key' comes before 'b_key' alphabetically
+				{Count: 5, URL: "https://example.com/b_key"},
 			},
 		},
 		"random multiple duplicates and not": {
@@ -47,20 +51,20 @@ func TestSortPages(t *testing.T) {
 				"https://example.com/epsilon": 2,
 			},
 			baseURL: "test.dev.com/path/",
-			expected: []reportStruct{
-				{Value: 5, Key: "https://example.com/delta"}, // Same value, delta before gamma
-				{Value: 5, Key: "https://example.com/gamma"},
-				{Value: 3, Key: "https://example.com/alpha"}, // Same value, alpha before beta
-				{Value: 3, Key: "https://example.com/beta"},
-				{Value: 2, Key: "https://example.com/epsilon"},
-				{Value: 1, Key: "https://example.com/zeta"},
+			expected: []ReportStruct{
+				{Count: 5, URL: "https://example.com/delta"}, // Same value, delta before gamma
+				{Count: 5, URL: "https://example.com/gamma"},
+				{Count: 3, URL: "https://example.com/alpha"}, // Same value, alpha before beta
+				{Count: 3, URL: "https://example.com/beta"},
+				{Count: 2, URL: "https://example.com/epsilon"},
+				{Count: 1, URL: "https://example.com/zeta"},
 			},
 		},
 	}
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			got, err := sortPages(tc.pages, tc.baseURL)
+			got, err := sortPages(tc.pages)
 			if err != nil {
 				t.Errorf("Test '%s' FAIL: unexpected error: %v", name, err)
 				return

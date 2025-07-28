@@ -5,9 +5,9 @@ import (
 	"sort"
 )
 
-type reportStruct struct {
-	Key   string
-	Value int
+type ReportStruct struct {
+	URL   string
+	Count int
 }
 
 func printReport(pages map[string]int, baseURL string) {
@@ -18,32 +18,35 @@ func printReport(pages map[string]int, baseURL string) {
 		=============================
 	`, baseURL)
 
-	sortedResults, err := sortPages(pages, baseURL)
+	sortedResults, err := sortPages(pages)
 	if err != nil {
 		fmt.Printf("Error sorting pages: %v\n", err)
 		return
 	}
 
-	for _, r := range sortedResults {
-		fmt.Printf("Found %d internal links to %s\n", r.Value, r.Key)
+	for _, page := range sortedResults {
+		fmt.Printf("Found %d internal links to %s\n", page.Count, page.URL)
 	}
 
 	// flag to save report to csv?
 }
 
-func sortPages(pages map[string]int, baseURL string) ([]reportStruct, error) {
+func sortPages(pages map[string]int) ([]ReportStruct, error) {
 
-	var ss []reportStruct
-	for key, value := range pages {
-		ss = append(ss, reportStruct{key, value})
+	pagesSlice := []ReportStruct{}
+	for url, count := range pages {
+		pagesSlice = append(pagesSlice, ReportStruct{
+			URL:   url,
+			Count: count,
+		})
 	}
 
-	sort.Slice(ss, func(i, j int) bool {
-		if ss[i].Value == ss[j].Value {
-			return ss[i].Key < ss[j].Key
+	sort.Slice(pagesSlice, func(i, j int) bool {
+		if pagesSlice[i].Count == pagesSlice[j].Count {
+			return pagesSlice[i].URL < pagesSlice[j].URL
 		}
-		return ss[i].Value > ss[j].Value
+		return pagesSlice[i].Count > pagesSlice[j].Count
 	})
 
-	return ss, nil
+	return pagesSlice, nil
 }
