@@ -5,14 +5,10 @@ import (
 	"net/url"
 )
 
-func (cfg *config) verifyMaxPagesLimit() bool {
+func (cfg *config) pagesLen() int {
 	cfg.mu.Lock()
 	defer cfg.mu.Unlock()
-
-	if len(cfg.pages) >= cfg.maxPages {
-		return true
-	}
-	return false
+	return len(cfg.pages)
 }
 
 func (cfg *config) crawlPage(rawCurrentURL string) {
@@ -26,7 +22,7 @@ func (cfg *config) crawlPage(rawCurrentURL string) {
 		cfg.wg.Done()
 	}()
 
-	if limitReaced := cfg.verifyMaxPagesLimit(); limitReaced {
+	if cfg.pagesLen() >= cfg.maxPages {
 		return
 	}
 
