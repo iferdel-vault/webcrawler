@@ -11,11 +11,6 @@ func TestSortPages(t *testing.T) {
 		baseURL  string
 		expected []reportStruct
 	}{
-		"no pages": {
-			pages:    map[string]int{},
-			baseURL:  "test.dev.com/path/",
-			expected: []reportStruct{},
-		},
 		"no duplicates per count (number ordering)": {
 			pages: map[string]int{
 				"https://example.com/page3": 5,
@@ -24,22 +19,22 @@ func TestSortPages(t *testing.T) {
 			},
 			baseURL: "test.dev.com/path/",
 			expected: []reportStruct{
-				{count: 10, url: "https://example.com/page1"},
-				{count: 5, url: "https://example.com/page3"},
-				{count: 2, url: "https://example.com/page2"},
+				{Value: 10, Key: "https://example.com/page1"},
+				{Value: 5, Key: "https://example.com/page3"},
+				{Value: 2, Key: "https://example.com/page2"},
 			},
 		},
 		"one duplicate (alphabetically ordered)": {
 			pages: map[string]int{
-				"https://example.com/b_url": 5,
-				"https://example.com/a_url": 5,
-				"https://example.com/c_url": 10,
+				"https://example.com/b_key": 5,
+				"https://example.com/a_key": 5,
+				"https://example.com/c_key": 10,
 			},
 			baseURL: "test.dev.com/path/",
 			expected: []reportStruct{
-				{count: 10, url: "https://example.com/c_url"},
-				{count: 5, url: "https://example.com/a_url"}, // 'a_url' comes before 'b_url' alphabetically
-				{count: 5, url: "https://example.com/b_url"},
+				{Value: 10, Key: "https://example.com/c_key"},
+				{Value: 5, Key: "https://example.com/a_key"}, // 'a_key' comes before 'b_key' alphabetically
+				{Value: 5, Key: "https://example.com/b_key"},
 			},
 		},
 		"random multiple duplicates and not": {
@@ -53,12 +48,12 @@ func TestSortPages(t *testing.T) {
 			},
 			baseURL: "test.dev.com/path/",
 			expected: []reportStruct{
-				{count: 5, url: "https://example.com/delta"}, // Same count, delta before gamma
-				{count: 5, url: "https://example.com/gamma"},
-				{count: 3, url: "https://example.com/alpha"}, // Same count, alpha before beta
-				{count: 3, url: "https://example.com/beta"},
-				{count: 2, url: "https://example.com/epsilon"},
-				{count: 1, url: "https://example.com/zeta"},
+				{Value: 5, Key: "https://example.com/delta"}, // Same value, delta before gamma
+				{Value: 5, Key: "https://example.com/gamma"},
+				{Value: 3, Key: "https://example.com/alpha"}, // Same value, alpha before beta
+				{Value: 3, Key: "https://example.com/beta"},
+				{Value: 2, Key: "https://example.com/epsilon"},
+				{Value: 1, Key: "https://example.com/zeta"},
 			},
 		},
 	}

@@ -1,19 +1,22 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"sort"
+)
 
 type reportStruct struct {
-	count int
-	url   string
+	Key   string
+	Value int
 }
 
 func printReport(pages map[string]int, baseURL string) {
 
-	fmt.Println(`
+	fmt.Printf(`
 		=============================
-			REPORT for https://example.com
+			REPORT for %s
 		=============================
-	`)
+	`, baseURL)
 
 	sortedResults, err := sortPages(pages, baseURL)
 	if err != nil {
@@ -22,14 +25,25 @@ func printReport(pages map[string]int, baseURL string) {
 	}
 
 	for _, r := range sortedResults {
-		fmt.Printf("Count: %d, URL: %s\n", r.count, r.url)
+		fmt.Printf("Found %d internal links to %s\n", r.Value, r.Key)
 	}
 
 	// flag to save report to csv?
 }
 
 func sortPages(pages map[string]int, baseURL string) ([]reportStruct, error) {
-	var results []reportStruct
 
-	return results, nil
+	var ss []reportStruct
+	for key, value := range pages {
+		ss = append(ss, reportStruct{key, value})
+	}
+
+	sort.Slice(ss, func(i, j int) bool {
+		if ss[i].Value == ss[j].Value {
+			return ss[i].Key < ss[j].Key
+		}
+		return ss[i].Value > ss[j].Value
+	})
+
+	return ss, nil
 }
