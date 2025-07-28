@@ -17,8 +17,9 @@ func main() {
 	}
 	rawBaseURL := os.Args[1]
 
-	const maxConcurrency = 10
-	cfg, err := configure(rawBaseURL, maxConcurrency)
+	const maxConcurrency = 3
+	const maxPages = 1
+	cfg, err := configure(rawBaseURL, maxConcurrency, maxPages)
 	if err != nil {
 		fmt.Printf("Error - configure: %v", err)
 		return

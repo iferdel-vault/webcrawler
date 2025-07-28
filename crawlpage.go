@@ -5,7 +5,18 @@ import (
 	"net/url"
 )
 
+func (cfg *config) verifyMaxPagesLimit() bool {
+	cfg.mu.Lock()
+	defer cfg.mu.Unlock()
+
+	if len(cfg.pages) >= cfg.maxPages {
+		return true
+	}
+	return false
+}
+
 func (cfg *config) crawlPage(rawCurrentURL string) {
+
 	// Blocks if the channel is full, limiting concurrent goroutines.
 	cfg.concurrencyControl <- struct{}{}
 	defer func() {
@@ -14,6 +25,10 @@ func (cfg *config) crawlPage(rawCurrentURL string) {
 		// Decrement the counter when the goroutine completes.
 		cfg.wg.Done()
 	}()
+
+	if limitReaced := cfg.verifyMaxPagesLimit(); limitReaced {
+		return
+	}
 
 	currentURL, err := url.Parse(rawCurrentURL)
 	if err != nil {
